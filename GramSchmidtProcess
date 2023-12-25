@@ -74,3 +74,88 @@ A = np.array([[1,0,2,6],
 #print(B[:,2])
 
 gsBasis4(A)
+
+#### result:
+
+array([[ 0.40824829, -0.1814885 ,  0.04982278,  0.89325973],
+       [ 0.        ,  0.1088931 ,  0.99349591, -0.03328918],
+       [ 0.81649658,  0.50816781, -0.06462163, -0.26631346],
+       [ 0.40824829, -0.83484711,  0.07942048, -0.36063281]])
+
+U = gsBasis4(A)
+gsBasis4(U)
+
+#### result:
+
+array([[ 0.40824829, -0.1814885 ,  0.04982278,  0.89325973],
+       [ 0.        ,  0.1088931 ,  0.99349591, -0.03328918],
+       [ 0.81649658,  0.50816781, -0.06462163, -0.26631346],
+       [ 0.40824829, -0.83484711,  0.07942048, -0.36063281]])
+
+
+
+# The second part of this exercise will generalise the procedure.
+# Previously, we could only have four vectors, and there was a lot of repeating in the code.
+# We'll use a for-loop here to iterate the process for each vector.
+def gsBasis(A) :
+    B = np.array(A, dtype=np.float_) # Make B as a copy of A, since we're going to alter it's values.
+    # Loop over all vectors, starting with zero, label them with i
+    for i in range(B.shape[1]):
+      # Inside that loop, loop over all previous vectors, j, to subtract.
+        for j in range(i) :
+            # Complete the code to subtract the overlap with previous vectors.
+            # you'll need the current vector B[:, i] and a previous vector B[:, j]
+            B[:, i] = B[:, i] - B[:,i] @ B[:,j] * B[:,j]
+        # Next insert code to do the normalisation test for B[:, i]
+        if la.norm(B[:,i]) > verySmallNumber:
+          B[:,i] = B[:,i] / la.norm(B[:,i])
+        else:
+          B[:, i] = np.zeros_like(B[:, i])
+
+    # Finally, we return the result:
+    return B
+
+M = np.array([[1,0,2,6],
+              [0,1,8,2],
+              [2,8,3,1],
+              [1,-6,2,3]], dtype=np.float_)
+
+gsBasis(M)
+
+# This function uses the Gram-schmidt process to calculate the dimension
+# spanned by a list of vectors.
+# Since each vector is normalised to one, or is zero,
+# the sum of all the norms will be the dimension.
+def dimensions(A) :
+    return np.sum(la.norm(gsBasis(A), axis=0))
+
+
+# See what happens for non-square matrices
+L = np.array([[3,2,3],
+              [2,5,-1],
+              [2,4,8],
+              [12,2,1]], dtype=np.float_)
+gsBasis(L)
+
+array([[ 0.23643312,  0.18771349,  0.22132104],
+       [ 0.15762208,  0.74769023, -0.64395812],
+       [ 0.15762208,  0.57790444,  0.72904263],
+       [ 0.94573249, -0.26786082, -0.06951101]])
+
+dimensions(L)
+
+3.0
+
+# Now let's see what happens when we have one vector that is a linear combination of the others.
+C = np.array([[1,0,2],
+              [0,1,-3],
+              [1,0,2]], dtype=np.float_)
+gsBasis(C)
+
+array([[0.70710678, 0.        , 0.        ],
+       [0.        , 1.        , 0.        ],
+       [0.70710678, 0.        , 0.        ]])
+
+dimensions(C)
+
+2.0
